@@ -10,8 +10,6 @@ def split_blocks(raw_dict: dict):
             new_dict["blocks"].append(block)
         elif block["type"] == TEXT_BLOCK_TYPE:
             for line in block["lines"]:
-                print(line["bbox"][0], block["bbox"][0])
-                print(line["bbox"][2], block["bbox"][2])
                 new_line = {"type": TEXT_BLOCK_TYPE, "lines": [line], "bbox": (
                     min(line["bbox"][0], block["bbox"][0]), line["bbox"][1], max(line["bbox"][2], block["bbox"][2]), line["bbox"][3])}
                 new_dict["blocks"].append(new_line)
