@@ -1,11 +1,12 @@
 # pdf2docx 
 
-![pdf2docx-test](https://github.com/dothinking/pdf2docx/workflows/pdf2docx-test/badge.svg)
-![pdf2docx-publish](https://github.com/dothinking/pdf2docx/workflows/pdf2docx-publish/badge.svg)
-![GitHub](https://img.shields.io/github/license/dothinking/pdf2docx)
+[dothinking/pdf2docx](https://github.com/dothinking/pdf2docx)魔改版本
 
-- Parse text, table and layout from PDF file with `PyMuPDF`
-- Generate docx with `python-docx`
+## 改动列表
+
+- 原有PyMuPDF有错误识别blocks的情况，这里将blocks中的每一个line都视为一个block
+- 将word写入时的tab_stop调整为first_text_indent（便于libreoffice将其转换为html后得到样式特征）
+- 增加判断段落（都是一行）是否居中的判断，如果居中，则将段落对齐情况设置为居中（原来都是左对齐）
 
 ## Features
 
@@ -39,30 +40,8 @@
 
 ## Installation
 
-### From Pypi
-
-```
-$ pip install pdf2docx
-```
-
-### From source code
-
-Clone or download this project, and navigate to the root directory:
-
-```
-$ python setup.py install
-```
-
-Or install it in developing mode:
-
-```
-$ python setup.py develop
-```
-
-### Uninstall
-
-```
-$ pip uninstall pdf2docx
+```bash
+pip install -U git+https://github.com/smilelight/pdf2docx.git@master
 ```
 
 ## Usage
