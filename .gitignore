@@ -12,3 +12,8 @@ layout.json
 build/
 dist/
 *egg-info/
+
+test_*
+
+# projects
+.idea
