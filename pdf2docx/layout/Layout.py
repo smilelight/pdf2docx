@@ -80,7 +80,7 @@ class Layout:
     def serialize(self, filename:str):
         '''Write layout to specified file.'''
         with open(filename, 'w', encoding='utf-8') as f:
-            f.write(json.dumps(self.store(), indent=4))
+            f.write(json.dumps(self.store(), indent=4, ensure_ascii=False))
 
 
     def plot(self, doc, title:str, key:PlotControl=PlotControl.LAYOUT):
@@ -209,8 +209,11 @@ class Layout:
             # make paragraphs
             if block.is_text_block():
                 # new paragraph
+                # for block_item in block.split():
+                #     p = doc.add_paragraph()
+                #     block_item.make_docx(p, self.margin)
                 p = doc.add_paragraph()
-                block.make_docx(p, self.margin)
+                block.make_docx(p, self.margin, (self.height, self.width))
             
             # make table
             elif block.is_table_block():

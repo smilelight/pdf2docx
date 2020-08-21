@@ -24,6 +24,8 @@ https://pymupdf.readthedocs.io/en/latest/textpage.html
 '''
 
 from docx.shared import Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+
 from .Line import Line
 from .Lines import Lines
 from .ImageSpan import ImageSpan
@@ -247,7 +249,7 @@ class TextBlock(Block):
             self.before_space = 0.0
 
 
-    def make_docx(self, p, bbox:tuple):
+    def make_docx(self, p, bbox:tuple, page_size: tuple = (0, 0)):
         ''' Create paragraph for a text block. Join line sets with TAB and set position according to bbox.
             ---
             Args:
@@ -269,6 +271,21 @@ class TextBlock(Block):
         # check text direction
         # normal direction by default, taking left border as a reference
         # when from bottom to top, taking bottom border as a reference
+        def text_alignment(text_bbox: tuple, page_size: tuple = (0, 0)):
+            assert len(text_bbox) == 4
+            assert len(page_size) == 2
+            text_left = text_bbox[0]
+            text_right = text_bbox[2]
+            page_height = page_size[0]
+            page_width = page_size[1]
+            if page_width != 0:
+                ratio = (text_right - text_left) / page_width
+                center_dis = abs((text_right + text_left) / page_width / 2 - 0.5)
+                if ratio < 0.6 and center_dis < 0.02:
+                    return WD_ALIGN_PARAGRAPH.CENTER
+                # if 0.6 <= ratio <= 0.9 and center_dis < 0.02:
+                #     return WD_ALIGN_PARAGRAPH.JUSTIFY_MED
+            return WD_ALIGN_PARAGRAPH.LEFT
         idx = 0 if self.is_horizontal else 3
 
         # indent and space setting
@@ -277,6 +294,10 @@ class TextBlock(Block):
         pf = docx.reset_paragraph_format(p)
         pf.space_before = Pt(before_spacing)
         pf.space_after = Pt(after_spacing)
+        pf.first_line_indent = Pt(self.bbox_raw[0] - bbox[0])
+        pf.alignment = text_alignment(self.bbox_raw, page_size=page_size)
+        if pf.alignment in [WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.JUSTIFY_MED]:
+            pf.first_line_indent = Pt(0)
         
         # restore default tabs
         pf.tab_stops.clear_all()
@@ -286,12 +307,12 @@ class TextBlock(Block):
         current_pos = 0.0
 
         # set all tab stops
-        all_pos = set([
-            round(abs(line.bbox_raw[idx]-bbox[idx]), 2) for line in self.lines
-            ])
-        for pos in all_pos:
-            if not pos: continue # ignore pos==0
-            pf.tab_stops.add_tab_stop(Pt(pos))
+        # all_pos = set([
+        #     round(abs(line.bbox_raw[idx]-bbox[idx]), 2) for line in self.lines
+        #     ])
+        # for pos in all_pos:
+        #     if not pos: continue # ignore pos==0
+        #     pf.tab_stops.add_tab_stop(Pt(pos))
 
         # add line by line
         for i, line in enumerate(self.lines):
