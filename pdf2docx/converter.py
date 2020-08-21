@@ -7,6 +7,7 @@ from docx import Document
 from .layout.Layout import Layout
 from .common.base import PlotControl
 from .common.pdf import new_page_section
+from .common.custom import split_blocks
 
 
 class Converter:
@@ -85,7 +86,8 @@ class Converter:
         '''Initialize layout object.'''
         # Layout object based on raw dict
         raw_layout = page.getText('rawdict')
-        self._layout = Layout(raw_layout)
+        new_layout = split_blocks(raw_layout)
+        self._layout = Layout(new_layout)
         
         # get rectangle shapes from page source
         self._layout.rects.from_stream(self.doc_pdf, page)
