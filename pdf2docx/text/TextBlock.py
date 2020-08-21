@@ -50,12 +50,6 @@ class TextBlock(Block):
         lines_text = [line.text for line in self.lines]
         return '\n'.join(lines_text)
 
-
-    @property
-    def sub_bboxes(self) -> list:
-        '''bbox of sub-region, i.e. Line.'''
-        return [line.bbox for line in self.lines]
-
     
     @property
     def text_direction(self):
@@ -84,7 +78,7 @@ class TextBlock(Block):
             self.lines.append(line)
 
 
-    def merge(self):
+    def join(self):
         '''Merge contained lines horizontally.'''
         self.lines.merge()
 
@@ -122,7 +116,7 @@ class TextBlock(Block):
                 span.plot(page, c)
 
 
-    def contains_discrete_lines(self, distance:float=25, threshold:int=3) -> bool:
+    def contains_discrete_lines(self, distance:float=25, threshold:int=2) -> bool:
         ''' Check whether lines in block are discrete: 
               - the count of lines with a distance larger than `distance` is greater then `threshold`.
               - ImageSpan exists
@@ -296,6 +290,7 @@ class TextBlock(Block):
             round(abs(line.bbox_raw[idx]-bbox[idx]), 2) for line in self.lines
             ])
         for pos in all_pos:
+            if not pos: continue # ignore pos==0
             pf.tab_stops.add_tab_stop(Pt(pos))
 
         # add line by line
